@@ -9,8 +9,8 @@ const PrivateStore = require('./privateStore')
 const OrbitdbKeyAdapter = require('./orbitdbKeyAdapter')
 const utils = require('./utils')
 
-// TODO: Put production 3box-hash-server instance here ;)
 const ADDRESS_SERVER_URL = 'https://beta.3box.io/address-server'
+const PINNING_SERVER = '/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmSMcMa3hRgDjvsvbNihsUNZ9ywW19etQBRB6dbnrptfRP'
 const IPFS_OPTIONS = {
   EXPERIMENTAL: {
     pubsub: true
@@ -43,6 +43,11 @@ class ThreeBox {
     const rootStoreAddress = await getRootStoreAddress(this._serverUrl, did)
     const didFingerprint = utils.sha256Multihash(did)
     this._ipfs = await initIPFS(opts.ipfsOptions)
+    // TODO - if connection to this peer is lost we should try to reconnect
+    await this._ipfs.swarm.connect(PINNING_SERVER)
+
+    console.log(await this._ipfs.swarm.peers())
+
     const keystore = new OrbitdbKeyAdapter(this._muportDID)
     this._orbitdb = new OrbitDB(this._ipfs, opts.orbitPath, { keystore })
     globalIPFS = this._ipfs
