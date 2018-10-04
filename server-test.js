@@ -46,7 +46,7 @@ ipfs.on('ready', async () => {
   )
   await readyPromise
 
-  function openDB (address, onProgress = () => {}) {
+  async function openDB (address, onProgress = () => {}) {
     console.log('Opening db:', address)
     let db = await orbitdb.open(address)
     db.load()
@@ -60,7 +60,6 @@ ipfs.on('ready', async () => {
         if (num === max) {
           db.events.on('replicated', () => {
             console.log('Fully replicated db:', odbAddress)
-            resolve()
           })
         }
       }
